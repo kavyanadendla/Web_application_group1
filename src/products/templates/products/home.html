@@ -1,0 +1,24 @@
+{% extends "products/base.html" %}
+{% block content %}
+    <main role="main" class="container">
+        {% include "products/messages.html" %}
+        <section class="row">
+            {% for product in products %}
+            <div class="col-md-3">
+                <div class="card text-center border-0 mb-4">
+                    <div>
+                        <a href="{% url 'products:product-detail' pk=product.pk %}">
+                            <img src="{{ product.thumbnail.url }}" class="card-img-top" alt="{{ product.name }}">
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text mb-1">{{ product.name }}</p>
+                        <p class="card-text font-weight-bold">{{ product.price|floatformat:2 }} $</p>
+                        <a href="{% url 'products:product-detail' pk=product.pk %}" class="btn btn-primary btn-block my-3">Buy Now</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </section>
+    </main>
+{% endblock %}

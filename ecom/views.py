@@ -95,6 +95,35 @@ def view_customer_view(request):
     customers = models.Customer.objects.all()
     return render(request, 'ecom/view_customer.html', {'customers': customers})
 
+# admin delete customer
+@login_required(login_url='adminlogin')
+def delete_customer_view(request, pk):
+    customer = models.Customer.objects.get(id=pk)
+    user = models.User.objects.get(id=customer.user_id)
+    user.delete()
+    customer.delete()
+    return redirect('view-customer')
+
+
+@login_required(login_url='adminlogin')
+def update_customer_view(request, pk):
+    customer = models.Customer.objects.get(id=pk)
+    user = models.User.objects.get(id=customer.user_id)
+    userForm = forms.CustomerUserForm(instance=user)
+    customerForm = forms.CustomerForm(request.FILES, instance=customer)
+    mydict = {'userForm': userForm, 'customerForm': customerForm}
+    if request.method == 'POST':
+        userForm = forms.CustomerUserForm(request.POST, instance=user)
+        customerForm = forms.CustomerForm(request.POST, instance=customer)
+        if userForm.is_valid() and customerForm.is_valid():
+            user = userForm.save()
+            user.set_password(user.password)
+            user.save()
+            customerForm.save()
+            return redirect('view-customer')
+    return render(request, 'ecom/admin_update_customer.html', context=mydict)
+
+
 # admin view the product
 @login_required(login_url='adminlogin')
 def admin_products_view(request):
@@ -145,6 +174,32 @@ def admin_view_booking_view(request):
         ordered_bys.append(ordered_by)
     return render(request, 'ecom/admin_view_booking.html', {'data': zip(ordered_products, ordered_bys, orders)})
 
+
+@login_required(login_url='adminlogin')
+def delete_order_view(request, pk):
+    order = models.Orders.objects.get(id=pk)
+    order.delete()
+    return redirect('admin-view-booking')
+
+
+# for changing status of order (pending,delivered...)
+@login_required(login_url='adminlogin')
+def update_order_view(request, pk):
+    order = models.Orders.objects.get(id=pk)
+    orderForm = forms.OrderForm(instance=order)
+    if request.method == 'POST':
+        orderForm = forms.OrderForm(request.POST, instance=order)
+        if orderForm.is_valid():
+            orderForm.save()
+            return redirect('admin-view-booking')
+    return render(request, 'ecom/update_order.html', {'orderForm': orderForm})
+
+
+# admin view the feedback
+@login_required(login_url='adminlogin')
+def view_feedback_view(request):
+    feedbacks = models.Feedback.objects.all().order_by('-id')
+    return render(request, 'ecom/view_feedback.html', {'feedbacks': feedbacks})
 
 # ---------------------------------------------------------------------------------
 # ------------------------ PUBLIC CUSTOMER RELATED VIEWS START ---------------------
@@ -262,4 +317,40 @@ def remove_from_cart_view(request, pk):
         response.set_cookie('product_ids', value)
         return response
 
+def send_feedback_view(request):
+    feedbackForm = forms.FeedbackForm()
+    if request.method == 'POST':
+        feedbackForm = forms.FeedbackForm(request.POST)
+        if feedbackForm.is_valid():
+            feedbackForm.save()
+            return render(request, 'ecom/feedback_sent.html')
+    return render(request, 'ecom/send_feedback.html', {'feedbackForm': feedbackForm})
 
+# ---------------------------------------------------------------------------------
+# ------------------------ CUSTOMER RELATED VIEWS START ------------------------------
+# ---------------------------------------------------------------------------------
+@login_required(login_url='customerlogin')
+@user_passes_test(is_customer)
+def customer_home_view(request):
+    products = models.Product.objects.all()
+    if 'product_ids' in request.COOKIES:
+        product_ids = request.COOKIES['product_ids']
+        counter = product_ids.split('|')
+        product_count_in_cart = len(set(counter))
+    else:
+        product_count_in_cart = 0
+    return render(request, 'ecom/customer_home.html',
+                  {'products': products, 'product_count_in_cart': product_count_in_cart})
+
+
+@login_required(login_url='customerlogin')
+@user_passes_test(is_customer)
+def my_order_view(request):
+    customer = models.Customer.objects.get(user_id=request.user.id)
+    orders = models.Orders.objects.all().filter(customer_id=customer)
+    ordered_products = []
+    for order in orders:
+        ordered_product = models.Product.objects.all().filter(id=order.product.id)
+        ordered_products.append(ordered_product)
+
+    return render(request, 'ecom/my_order.html', {'data': zip(ordered_products, orders)})

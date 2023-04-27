@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Web-Pharma </title>
+  <style media="screen">
+    .footer{
+      position: fixed;
+    }
+
+    body {
+
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #80ff80;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #2c3e50, #bdc3c7);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to bottom, #008000,  #0047b3); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
+}
+
+  </style>
+</head>
+
+<body style="background-color:#f7f7f7;">
+  {%if request.user.is_authenticated%}
+    {% include "ecom/customer_navbar.html" %}
+  {%else%}
+    {% include "ecom/navbar.html" %}
+  {%endif%}
+  <br><br><br>
+<h3 style="text-align:center;">"Web Pharma is a web application built with Django framework that offers a platform to purchase prescribed medicines online. With Web Pharma, customers
+  can upload their prescription and order the required
+  medication from the comfort of their homes. Our website ensures the authenticity of medications by sourcing them only from licensed pharmacies and manufacturers.
+
+The website features an intuitive and user-friendly interface for easy navigation and an efficient search engine to locate medicines quickly. Web Pharma also
+  has a team of experienced pharmacists to answer customer queries and provide them with medication-related advice.
+
+At Web Pharma, we prioritize customer satisfaction and strive to provide the best possible service. Our mission is to make the process of purchasing medicines convenient
+  and hassle-free for everyone." </h3>
+<br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+  {% include "ecom/footer.html" %}
+</body>
+<!--
+developed for web-pharma medicine
+-->
+
+</html>

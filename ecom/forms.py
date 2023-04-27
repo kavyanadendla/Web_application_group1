@@ -18,3 +18,14 @@ class CustomerForm(forms.ModelForm):
         fields = ['address', 'mobile', 'profile_pic']
 
 
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = models.Product
+        fields = ['name', 'price', 'description', 'product_image']
+
+
+# address of shipment
+class AddressForm(forms.Form):
+    Email = forms.EmailField()
+    Mobile = forms.IntegerField()
+    Address = forms.CharField(max_length=500)

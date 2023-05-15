@@ -7,6 +7,42 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from django.conf import settings
 
+from django.shortcuts import redirect, get_object_or_404
+from .models import Product
+# views.py
+
+from django.core.mail import send_mail
+from django.conf import settings
+from django.shortcuts import render, redirect
+from .forms import ContactForm
+
+
+def contact_view(request):
+    if request.method == 'POST':
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+
+            send_mail(
+                'New Contact Message',
+                f'Name: {name}\nEmail: {email}\nMessage: {message}',
+                settings.EMAIL_HOST_USER,
+                [settings.EMAIL_RECEIVING_USER],
+                fail_silently=False
+            )
+
+            return redirect('contact_success')
+    else:
+        form = ContactForm()
+
+    return render(request, 'ecom/contactus.html', {'form': form})
+
+
+from django.http import JsonResponse
+
+
 
 def home_view(request):
     products = models.Product.objects.all()
@@ -60,6 +96,7 @@ def afterlogin_view(request):
     else:
         return redirect('admin-dashboard')
 
+
 # ---------------------------------------------------------------------------------
 # ------------------------ ADMIN RELATED VIEWS START ------------------------------
 # ---------------------------------------------------------------------------------
@@ -94,6 +131,7 @@ def admin_dashboard_view(request):
 def view_customer_view(request):
     customers = models.Customer.objects.all()
     return render(request, 'ecom/view_customer.html', {'customers': customers})
+
 
 # admin delete customer
 @login_required(login_url='adminlogin')
@@ -201,6 +239,7 @@ def view_feedback_view(request):
     feedbacks = models.Feedback.objects.all().order_by('-id')
     return render(request, 'ecom/view_feedback.html', {'feedbacks': feedbacks})
 
+
 # ---------------------------------------------------------------------------------
 # ------------------------ PUBLIC CUSTOMER RELATED VIEWS START ---------------------
 # ---------------------------------------------------------------------------------
@@ -252,10 +291,10 @@ def add_to_cart_view(request, pk):
         response.set_cookie('product_ids', pk)
 
     product = models.Product.objects.get(id=pk)
-    messages.info(request, product.name + ' added to cart successfully!')
 
     return response
-    
+
+
 # for checkout of cart
 def cart_view(request):
     # for cart counter
@@ -317,6 +356,7 @@ def remove_from_cart_view(request, pk):
         response.set_cookie('product_ids', value)
         return response
 
+
 def send_feedback_view(request):
     feedbackForm = forms.FeedbackForm()
     if request.method == 'POST':
@@ -325,6 +365,7 @@ def send_feedback_view(request):
             feedbackForm.save()
             return render(request, 'ecom/feedback_sent.html')
     return render(request, 'ecom/send_feedback.html', {'feedbackForm': feedbackForm})
+
 
 # ---------------------------------------------------------------------------------
 # ------------------------ CUSTOMER RELATED VIEWS START ------------------------------
@@ -341,6 +382,7 @@ def customer_home_view(request):
         product_count_in_cart = 0
     return render(request, 'ecom/customer_home.html',
                   {'products': products, 'product_count_in_cart': product_count_in_cart})
+
 
 # shipment address before placing order
 @login_required(login_url='customerlogin')
@@ -447,6 +489,21 @@ def my_order_view(request):
 
     return render(request, 'ecom/my_order.html', {'data': zip(ordered_products, orders)})
 
+
+# @login_required(login_url='customerlogin')
+# @user_passes_test(is_customer)
+# def my_order_view2(request):
+
+#     products=models.Product.objects.all()
+#     if 'product_ids' in request.COOKIES:
+#         product_ids = request.COOKIES['product_ids']
+#         counter=product_ids.split('|')
+#         product_count_in_cart=len(set(counter))
+#     else:
+#         product_count_in_cart=0
+#     return render(request,'ecom/my_order.html',{'products':products,'product_count_in_cart':product_count_in_cart})    
+
+
 # --------------for discharge patient bill (pdf) download and printing
 import io
 from xhtml2pdf import pisa
@@ -512,6 +569,8 @@ def edit_profile_view(request):
             customerForm.save()
             return HttpResponseRedirect('my-profile')
     return render(request, 'ecom/edit_profile.html', context=mydict)
+
+
 # ---------------------------------------------------------------------------------
 # ------------------------ ABOUT US AND CONTACT US VIEWS START --------------------
 # ---------------------------------------------------------------------------------

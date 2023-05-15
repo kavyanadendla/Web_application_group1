@@ -70,6 +70,18 @@ def wishlist_view(request):
 
     return render(request, 'ecom/wishlist.html', {'wishlist_items': wishlist_items, 'wishlist_count': wishlist_count})
 
+@login_required(login_url='customerlogin')
+def add_to_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    customer = request.user.customer
+    customer.wishlist.add(product)  # Add the product to the wishlist
+
+    wishlist_count = request.session.get('wishlist_count', 0)
+    wishlist_count += 1
+    request.session['wishlist_count'] = wishlist_count
+
+    return render(request, 'ecom/wishlist.html', {'wishlist_count': wishlist_count})
+
 def home_view(request):
     products = models.Product.objects.all()
     if 'product_ids' in request.COOKIES:

@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import path
 from ecom import views
 from django.contrib.auth.views import LoginView,LogoutView
-
+from ecom.views import remove_from_wishlist, wishlist_view
 
 
 urlpatterns = [
@@ -52,6 +52,10 @@ urlpatterns = [
 
  
     path('contactus/', views.contactus_view, name='contactus'),
+    path('wishlist/', views.wishlist_view, name='wishlist'),
+    path('wishlist/', wishlist_view, name='wishlist_view'),
+    path('wishlist/remove/<int:product_id>/', remove_from_wishlist, name='remove_from_wishlist'),
+    path('wishlist/add/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
 
 
 

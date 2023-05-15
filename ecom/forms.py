@@ -1,6 +1,13 @@
 from django import forms
 from django.contrib.auth.models import User
 from . import models
+from django import forms
+
+
+class ContactForm(forms.Form):
+    name = forms.CharField(label='Your Name', max_length=100)
+    email = forms.EmailField(label='Your Email')
+    message = forms.CharField(label='Your Message', widget=forms.Textarea)
 
 
 class CustomerUserForm(forms.ModelForm):
@@ -30,6 +37,7 @@ class AddressForm(forms.Form):
     Mobile = forms.IntegerField()
     Address = forms.CharField(max_length=500)
 
+
 class FeedbackForm(forms.ModelForm):
     class Meta:
         model = models.Feedback
@@ -41,6 +49,7 @@ class OrderForm(forms.ModelForm):
     class Meta:
         model = models.Orders
         fields = ['status']
+
 
 # for contact us page
 class ContactusForm(forms.Form):

@@ -8,6 +8,8 @@ class Customer(models.Model):
     profile_pic = models.ImageField(upload_to='profile_pic/CustomerProfilePic/', null=True, blank=True)
     address = models.CharField(max_length=40)
     mobile = models.CharField(max_length=20, null=False)
+    wishlist = models.ManyToManyField('ecom.Product', related_name='customers')
+    is_in_wishlist = models.BooleanField(default=False)
 
     @property
     def get_name(self):
@@ -30,6 +32,7 @@ class Product(models.Model):
     def __str__(self):
         return self.name
 
+
 class Orders(models.Model):
     STATUS = (
         ('Pending', 'Pending'),
@@ -44,6 +47,7 @@ class Orders(models.Model):
     mobile = models.CharField(max_length=20, null=True)
     order_date = models.DateField(auto_now_add=True, null=True)
     status = models.CharField(max_length=50, null=True, choices=STATUS)
+
 
 class Feedback(models.Model):
     name = models.CharField(max_length=40)

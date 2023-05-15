@@ -104,66 +104,45 @@
 
 </head>
 
+
+{% if added_product %}
+  <div class="added-product">
+    <h3>Added Product:</h3>
+    <div class="product-info">
+
+      <div class="product-details">
+        <p class="product-name">{{ added_product.name }}</p>
+        <p class="product-price">${{ added_product.price }}</p>
+        <p class="product-description">{{ added_product.description }}</p>
+      </div>
+    </div>
+  </div>
+{% endif %}
+<!-- wishlist.html -->
+<!-- wishlist.html -->
+{% for product in wishlist_items %}
+  <p>{{ product.name }}</p>
+  <a href="{% url 'remove_from_wishlist' product.id %}">Remove from Wishlist</a>
+{% endfor %}
+
+<p>Number of products in wishlist: {{ wishlist_count }}</p>
+<a href="{% url 'wishlist_view' %}" class="btn btn-primary">View Wishlist</a>
+
+
+
+
+
+
 <br><br><br><br>
 
-<div class="container">
-  <div class="panel panel-success">
-    <div class="panel-heading">
-      <h6 style="text-align:center;" class="panel-title">My Cart</h6>
-    </div>
-    <table class="table table-hover table-bordered" id="dev-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Image</th>
-          <th>Price</th>
-          <th>Description</th>
-          <th>Action</th>
 
-        </tr>
-      </thead>
-      {% for p in products %}
-  {% if p %}
-
-      <tr>
-        <td> {{p.name}}</td>
-        <td> <img src="{% static p.product_image.url %}" alt="Profile Pic" height="50px" width="50px" /></td>
-        <td>$ {{p.price}}</td>
-        <td>{{p.description}}</td>
-            <td>
-                <a class="btn btn-danger btn-xs" href="{% url 'remove-from-cart' p.id  %}"
-                 onclick="return confirm('Are you sure you want to remove this item from the cart?');">
-                 <span class="glyphicon glyphicon-trash"></span>
-                </a>
-            </td>
-          <td>
-               <form action="{% url 'add_to_wishlist' p.id %}" method="post">
-              {% csrf_token %}
-              <button type="submit" class="btn btn-heart btn-xs">Add to Wishlist</button>
-          </form>
-
-          </td>
-
-
-
-
-      </tr>
-      </tr>
-
-
-
-      {%else%}
-      <br><br><br>
-      <h1>no products</h1>
-      {% endif %}
-      {% endfor %}
-    </table>
-  </div>
-</div>
 <br><br><br>
 <div style="text-align: center;">
-  <button class="btn btn-danger btn-lg">Total ${{total}}</button>
-  <a href="/customer-address"><button class="btn btn-success btn-lg" ><span>Purchase </span></button></a>
+
+  <li>
+
+  </li>
+  <a style="text-decoration:none;" href="/customer-home">Continue Shopping</a>
 </div>
 
 

@@ -42,7 +42,33 @@ def contact_view(request):
 
 from django.http import JsonResponse
 
+@login_required(login_url='customerlogin')
+def remove_from_wishlist(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    customer = request.user.customer
+    customer.wishlist.remove(product)  # Remove the product from the wishlist
 
+    wishlist_count = request.session.get('wishlist_count', 0)
+    wishlist_count -= 1
+    request.session['wishlist_count'] = wishlist_count
+
+    wishlist_items = customer.wishlist.all()  # Get all items in the wishlist
+
+    # Create a dictionary with the updated wishlist items and count
+    data = {
+        'wishlist_items': list(wishlist_items.values()),  # Convert QuerySet to list of dictionaries
+        'wishlist_count': wishlist_count,
+    }
+
+    return JsonResponse(data)
+
+@login_required(login_url='customerlogin')
+def wishlist_view(request):
+    customer = request.user.customer
+    wishlist_items = customer.wishlist.all()
+    wishlist_count = request.session.get('wishlist_count', 0)
+
+    return render(request, 'ecom/wishlist.html', {'wishlist_items': wishlist_items, 'wishlist_count': wishlist_count})
 
 def home_view(request):
     products = models.Product.objects.all()
